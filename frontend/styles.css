@@ -1,0 +1,38 @@
+html, body {
+	height: 100vh;
+	padding: 0;
+	margin: 0;
+}
+
+.header {
+	height: 10%;
+}
+
+#container {
+	display: flex;
+	gap: 1px;
+	flex-flow: row wrap;
+	justify-content: center;
+	width: auto;
+	height: 50%;
+	padding: 3% 25% 10% 25%;
+}
+
+.square {
+	padding: 10px;
+	background-color: #ccc;
+	border: 1px solid black;
+	width: auto;
+	height: auto;
+	flex: 0 1 25%;
+}
+
+.blue {
+	background-color: blue;
+}
+
+.red {
+	background-color: red;
+}
+
+

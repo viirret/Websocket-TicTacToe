@@ -3,19 +3,27 @@
 <head>
 	<meta charset="utf-8">
 	<title>NodeJS WebSocket Server</title>
+	<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-	<h1>Client</h1>
-<script>
-const ws = new WebSocket("ws://localhost:8080");
-ws.addEventListener("open", () =>{
-  console.log("We are connected");
-  ws.send("How are you?");
-});
- 
-ws.addEventListener('message', function (event) {
-    console.log(event.data);
-});
-</script>
+	<div class="header"> 
+		<h1>TicTacToe</h1>
+	</div>
+	<div id="container">
+		<div class="square" data-id="0"></div>
+		<div class="square" data-id="1"></div>
+		<div class="square" data-id="2"></div>
+		<div class="square" data-id="3"></div>
+		<div class="square" data-id="4"></div>
+		<div class="square" data-id="5"></div>
+		<div class="square" data-id="6"></div>
+		<div class="square" data-id="7"></div>
+		<div class="square" data-id="8"></div>
+	</div>
+	<div id="info">
+		<div class="player_name">Player Name</div>
+		<div class="player_turn">Player Turn</div>
+	</div>
+<script src="app.js"></script>
 </body>
 </html>

@@ -18,7 +18,7 @@ const initialize = () => {
 
 // update the board and whos turn its to play
 const updateBoard = () => {
-	let turn = gameState.nextPlayer ? "My turn" : "Opponents turn";
+	let turn = gameState.nextPlayer === gameState.playerId ? "My turn" : "Opponents turn";
 	document.querySelector('.player_turn').innerHTML = turn;
 
 	let board = gameState.board;
@@ -39,21 +39,28 @@ const updateBoard = () => {
 	}
 }
 
+const updateWinner = (player) => {
+	document.querySelector('.winner').innerHTML = player + " wins!";
+}
+
 // respond to server push messages
 ws.addEventListener('message', (message) => {
 	let action = JSON.parse(message.data);
 
-	switch(action.type)
-	{
+	switch(action.type) {
 		case 'setup':
 			gameState = action.playerData;
 			initialize();
 			break;
 		
 		case 'update':
-			gameState.playerTurn = action.playerTurn;
+			gameState.playerTurn = action.nextPlayer;
 			gameState.board = action.board;
 			updateBoard();
+			break;
+
+		case 'victory':
+			updateWinner(action.winner);
 			break;
 		default: console.error("Invalid action");
 	}

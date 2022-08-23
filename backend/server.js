@@ -4,33 +4,72 @@ const WebSocketServer = require('ws');
 
 const empty = new Array(9).fill(0);
 
+// tracking object of game state
 let state = {
-	players: ['one', 'two'],
+	players: ['red', 'blue'],
 	nextPlayer: 0,
 	playerAmount: 0,
 	board: empty
 }
 
+// helper function to start game over
 const resetGame = () => {
 	state.nextPlayer = 0;
 	state.board = empty;
 }
 
 // Handles changing the state of the board
-//   also make sure only the right player is allowed to move
 const playerMove = (player, cellId) => {
 
 	// correct player makes a move
 	if (player === state.players[state.nextPlayer]) {
 
-		let cellValue = player === 'one' ? 1 : player === 'two' ? -1 : 0;
+		// cell value for correct player
+		let cellValue = player === state.players[0] ? 1 : player === state.players[1] ? -1 : 0;
 
-		// same goes for this one
+		// board for the cell gets players value
 		state.board[cellId] = cellValue
 
+		// set next player
 		state.nextPlayer = state.nextPlayer >= 1 ? 0 : state.nextPlayer += 1;
-  }
+  	}
+	
+	checkWin();
+
 }
+
+const checkWin = () => {
+	// straight lines
+	for(let i = 0; i < state.board.length; i++) {
+		if(i === 0 || i === 3 || i === 6)
+			if(state.board[i] === state.board[i + 1] && state.board[i + 1] === state.board[i + 2])
+				state.board[i] === 1 ? updateVictory("Red") : state.board[i] === -1 ? updateVictory("Blue") : {};
+
+		if(i === 0 || i === 1 || i === 2)
+			if(state.board[i] === state.board[i + 3] && state.board[i + 3] === state.board[i + 6])
+				state.board[i] === 1 ? updateVictory("Red") : state.board[i] === -1 ? updateVictory("Blue") : {};
+	}
+
+	// crossing lines
+	if(state.board[0] === state.board[4] && state.board[4] === state.board[8])
+		state.board[0] === 1 ? updateVictory("Red") : state.board[0] === -1 ? updateVictory("Blue") : {};
+
+	if(state.board[2] === state.board[4] && state.board[4] === state.board[6])
+		state.board[2] === 1 ? updateVictory("Red") : state.board[2] === -1 ? updateVictory("Blue") : {};
+}
+
+const updateVictory = (player) => {
+	wss.clients.forEach((client) => {
+		if(client.readyState == WebSocketServer.OPEN) {
+			let message = {
+				type: 'victory',
+				winner: player	
+			}
+			client.send(JSON.stringify(message));
+		}
+	})
+}
+
 
 // update game for both clients
 const updateClientState = () => {
@@ -42,7 +81,7 @@ const updateClientState = () => {
 				board:    state.board
 			}
 		
-		client.send(JSON.stringify(message));
+			client.send(JSON.stringify(message));
 		}
   	})
 }
@@ -70,13 +109,8 @@ wss.on("connection", ws => {
 
 		let action = JSON.parse(message);
 
-		console.log(message);
-		console.log(action);
-
 		switch(action.type) {
 			case 'move':
-				console.log("got move at " + action.cellId);
-				console.log("move made by " + action.playerId);
 				playerMove(action.playerId, action.cellId);
 				updateClientState();
 			break;

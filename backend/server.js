@@ -2,20 +2,12 @@
 
 const WebSocketServer = require('ws');
 
-const empty = new Array(9).fill(0);
-
 // tracking object of game state
 let state = {
 	players: ['red', 'blue'],
 	nextPlayer: 0,
 	playerAmount: 0,
-	board: empty
-}
-
-// helper function to start game over
-const resetGame = () => {
-	state.nextPlayer = 0;
-	state.board = empty;
+	board: new Array(9).fill(0)
 }
 
 // Handles changing the state of the board
@@ -113,7 +105,11 @@ wss.on("connection", ws => {
 			case 'move':
 				playerMove(action.playerId, action.cellId);
 				updateClientState();
-			break;
+				break;
+			case 'restart':
+				state.board = new Array(9).fill(0);
+				updateClientState();
+				break;
 		  default: console.error('Invalid Message');
 		}
 	})

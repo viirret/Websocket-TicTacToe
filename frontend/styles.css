@@ -4,6 +4,19 @@ html, body {
 	margin: 0;
 }
 
+h1 {
+	text-align: center;	
+}
+
+#button_div {
+	text-align: center;
+	display: none;
+}
+
+.player_name, .player_turn, .winner {
+	text-align: center;
+}
+
 .header {
 	height: 10%;
 }

@@ -7,19 +7,26 @@ const empty = new Array(9).fill(0);
 let gameState = {
 	nextPlayer: undefined,
 	playerId: 	undefined,
-	board: 		empty
+	board: 		empty,
 };
 	
 // fill the DOM with initial game state
 const initialize = () => {
-	document.querySelector('.player_name').innerHTML = `Player ${gameState.playerId}`;
+	document.querySelector('.player_name').innerHTML = `You are player ${gameState.playerId}`;
+	document.querySelector('#button_div').style.display = "none";
 	updateBoard();
+}
+
+const updateTurn = () => {
+	document.querySelector(".player_turn").innerHTML = gameState.playerId === gameState.nextPlayer
+		? "Your turn"
+		: "Opponent's turn";
 }
 
 // update the board and whos turn its to play
 const updateBoard = () => {
-	let turn = gameState.nextPlayer === gameState.playerId ? "My turn" : "Opponents turn";
-	document.querySelector('.player_turn').innerHTML = turn;
+	
+	updateTurn();
 
 	let board = gameState.board;
 
@@ -41,6 +48,15 @@ const updateBoard = () => {
 
 const updateWinner = (player) => {
 	document.querySelector('.winner').innerHTML = player + " wins!";
+
+	const btn = document.querySelector('#button_div');
+	btn.style.display = "block";
+	btn.addEventListener('click', () => {
+		let message = {
+			type: 'restart'
+		}
+		ws.send(JSON.stringify(message));
+	})
 }
 
 // respond to server push messages
@@ -54,7 +70,7 @@ ws.addEventListener('message', (message) => {
 			break;
 		
 		case 'update':
-			gameState.playerTurn = action.nextPlayer;
+			gameState.nextPlayer = action.nextPlayer;
 			gameState.board = action.board;
 			updateBoard();
 			break;
@@ -71,6 +87,7 @@ ws.addEventListener('open', () => {
 	let container = document.querySelector('#container');
 	
 	container.addEventListener('click', (event) => {
+		updateTurn();
 
 		let element = event.target;
 		let message = {

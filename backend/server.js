@@ -78,6 +78,15 @@ const updateClientState = () => {
   	})
 }
 
+const sendRestart = () => {
+	wss.clients.forEach((client) => {
+		let message = {
+			type: 'restart'
+		}
+		client.send(JSON.stringify(message));
+	})
+}
+
 // Creating a new websocket server on port 8080
 const wss = new WebSocketServer.Server({ port: 8080 })
  
@@ -106,11 +115,14 @@ wss.on("connection", ws => {
 				playerMove(action.playerId, action.cellId);
 				updateClientState();
 				break;
+
 			case 'restart':
 				state.board = new Array(9).fill(0);
 				updateClientState();
+				sendRestart();
 				break;
-		  default: console.error('Invalid Message');
+
+		  	default: console.error('Invalid Message');
 		}
 	})
 

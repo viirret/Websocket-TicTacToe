@@ -10,11 +10,17 @@ let gameState = {
 	board: 		empty,
 };
 	
-// fill the DOM with initial game state
 const initialize = () => {
+	setDOM();
+	updateBoard();
+	updateTurn();
+}
+
+const setDOM = () => {
 	document.querySelector('.player_name').innerHTML = `You are player ${gameState.playerId}`;
 	document.querySelector('#button_div').style.display = "none";
-	updateBoard();
+	document.querySelector('.player_turn').style.display = "block";
+	document.querySelector('.winner').innerHTML = "";
 }
 
 const updateTurn = () => {
@@ -26,8 +32,6 @@ const updateTurn = () => {
 // update the board and whos turn its to play
 const updateBoard = () => {
 	
-	updateTurn();
-
 	let board = gameState.board;
 
 	for(let i = 0; i < board.length; i++) {
@@ -48,9 +52,11 @@ const updateBoard = () => {
 
 const updateWinner = (player) => {
 	document.querySelector('.winner').innerHTML = player + " wins!";
+	document.querySelector('.player_turn').style.display = "none";
 
 	const btn = document.querySelector('#button_div');
 	btn.style.display = "block";
+
 	btn.addEventListener('click', () => {
 		let message = {
 			type: 'restart'
@@ -59,7 +65,7 @@ const updateWinner = (player) => {
 	})
 }
 
-// respond to server push messages
+// respond to server messages
 ws.addEventListener('message', (message) => {
 	let action = JSON.parse(message.data);
 
@@ -73,10 +79,15 @@ ws.addEventListener('message', (message) => {
 			gameState.nextPlayer = action.nextPlayer;
 			gameState.board = action.board;
 			updateBoard();
+			updateTurn();
 			break;
 
 		case 'victory':
 			updateWinner(action.winner);
+			break;
+
+		case 'restart':
+			setDOM();
 			break;
 		default: console.error("Invalid action");
 	}

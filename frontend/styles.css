@@ -13,8 +13,13 @@ h1 {
 	display: none;
 }
 
+button {
+	font-size: 30px;
+}
+
 .player_name, .player_turn, .winner {
 	text-align: center;
+	font-size: 30px;
 }
 
 .header {
@@ -28,7 +33,7 @@ h1 {
 	justify-content: center;
 	width: auto;
 	height: 50%;
-	padding: 3% 25% 10% 25%;
+	padding: 3% 25% 5% 25%;
 }
 
 .square {

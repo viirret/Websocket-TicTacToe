@@ -52,8 +52,12 @@ const updateBoard = () => {
 
 // update clients if winner is found
 const updateWinner = (player) => {
-	document.querySelector('.winner').innerHTML = player + " wins!";
+	
+	// make DOM changes
+	let winner = document.querySelector('.winner');
+	winner.innerHTML = player + " wins!";
 	document.querySelector('.player_turn').style.display = "none";
+	player === "Red" ? winner.style.color = "red" : winner.style.color = "blue";
 
 	const btn = document.querySelector('#button_div');
 	btn.style.display = "block";

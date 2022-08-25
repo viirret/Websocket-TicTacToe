@@ -10,24 +10,20 @@ let state = {
 	board: new Array(9).fill(0)
 }
 
-// Handles changing the state of the board
 const playerMove = (player, cellId) => {
 
 	// correct player makes a move
-	if (player === state.players[state.nextPlayer]) {
+	if(player === state.players[state.nextPlayer]) {
 
-		// cell value for correct player
-		let cellValue = player === state.players[0] ? 1 : player === state.players[1] ? -1 : 0;
+		// set the board in correct position as the players value (1, -1)
+		state.board[cellId] = player === state.players[0] ? 1 : player === state.players[1] ? -1 : 0;
 
-		// board for the cell gets players value
-		state.board[cellId] = cellValue
-
-		// set next player
+		// set next player (1 -> 0, 0 -> 1)
 		state.nextPlayer = state.nextPlayer >= 1 ? 0 : state.nextPlayer += 1;
   	}
-	
-	checkWin();
 
+	// check if this move caused a victory
+	checkWin();
 }
 
 const checkWin = () => {
@@ -50,9 +46,10 @@ const checkWin = () => {
 		state.board[2] === 1 ? updateVictory("Red") : state.board[2] === -1 ? updateVictory("Blue") : {};
 }
 
+// update victory for all clients
 const updateVictory = (player) => {
 	wss.clients.forEach((client) => {
-		if(client.readyState == WebSocketServer.OPEN) {
+		if(client.readyState === WebSocketServer.OPEN) {
 			let message = {
 				type: 'victory',
 				winner: player	
@@ -62,39 +59,40 @@ const updateVictory = (player) => {
 	})
 }
 
-
 // update game for both clients
 const updateClientState = () => {
 	wss.clients.forEach((client) => {
-		if (client.readyState === WebSocketServer.OPEN) {
+		if(client.readyState === WebSocketServer.OPEN) {
 			let message = {
 				type:     'update',
 				nextPlayer: state.players[state.nextPlayer],
 				board:    state.board
 			}
-		
 			client.send(JSON.stringify(message));
 		}
   	})
 }
 
+// update restart for all clients
 const sendRestart = () => {
 	wss.clients.forEach((client) => {
-		let message = {
-			type: 'restart'
+		if(client.readyState === WebSocketServer.OPEN) {
+			let message = {
+				type: 'restart'
+			}
+			client.send(JSON.stringify(message));
 		}
-		client.send(JSON.stringify(message));
 	})
 }
 
-// Creating a new websocket server on port 8080
+// creating a new websocket server on port 8080
 const wss = new WebSocketServer.Server({ port: 8080 })
  
-// Creating connection using websocket
+// creating connection using websocket
 wss.on("connection", ws => {
     console.log("new client connected");
 
-	// Send the game setup to the client
+	// send the game setup to the client
 	let message = {
 		type: 'setup',
 		playerData: {
@@ -111,11 +109,14 @@ wss.on("connection", ws => {
 		let action = JSON.parse(message);
 
 		switch(action.type) {
+
+			// handling clients moves
 			case 'move':
 				playerMove(action.playerId, action.cellId);
 				updateClientState();
 				break;
 
+			// other client sends this message, and server responds by saying restart to all clients
 			case 'restart':
 				state.board = new Array(9).fill(0);
 				updateClientState();

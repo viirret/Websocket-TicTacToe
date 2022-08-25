@@ -31,6 +31,6 @@ Run it with:
 chmod +x build.sh && ./build.sh
 ```
 
-However you have to copy the other window, because you cannot create two windows in a script without creating a dependency to browser I don't wish to do that.
+However you have to copy the other window, because you cannot create two windows in a script without creating a dependency to browser and I don't wish to do that.
 
 

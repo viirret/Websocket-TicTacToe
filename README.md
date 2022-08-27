@@ -1,6 +1,5 @@
 # Websocket-TicTacToe
 
-A school project about learning Node.js
 
 # How to run the program
 
